@@ -85,18 +85,18 @@ fn judge_container<T>(
     {
         return Ok(false);
     }
-    if reader.boolean(&parent.element, "AXVisible")? == Some(false) {
-        return Ok(false);
-    }
-    Ok(!inside_landmark(parent, reader)?)
+    Ok(!excluded_by_ancestry(parent, reader)?)
 }
 
-fn inside_landmark<T>(
+fn excluded_by_ancestry<T>(
     start: &Rc<Lineage<T>>,
     reader: &mut impl MenuTreeReader<T>,
 ) -> Result<bool, AdapterError> {
     let mut current = Some(start);
     while let Some(node) = current {
+        if reader.boolean(&node.element, "AXVisible")? == Some(false) {
+            return Ok(true);
+        }
         let subrole = reader.string(&node.element, "AXSubrole")?;
         if subrole
             .as_deref()

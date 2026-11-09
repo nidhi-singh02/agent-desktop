@@ -138,6 +138,22 @@ fn a_hidden_item_does_not_mask_a_later_visible_popup() {
 }
 
 #[test]
+fn a_hidden_ancestor_above_the_container_hides_the_menu() {
+    let mut tree = popup_in_dialog().hidden(2);
+    assert_eq!(search(&mut tree).1, None);
+}
+
+#[test]
+fn a_hidden_branch_does_not_mask_a_visible_popup_beside_it() {
+    let mut tree = popup_in_dialog()
+        .node(0, "AXWindow", &[1, 2, 7])
+        .node(7, "AXGroup", &[8])
+        .node(8, "AXMenuItem", &[])
+        .hidden(2);
+    assert_eq!(search(&mut tree).1, Some(("app/children/2".into(), 7)));
+}
+
+#[test]
 fn menu_roles_never_become_popup_containers() {
     let mut hidden_menu = popup_in_dialog().node(3, "AXMenu", &[4, 5, 6]).hidden(3);
     assert_eq!(search(&mut hidden_menu).1, None);

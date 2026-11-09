@@ -120,6 +120,24 @@ fn hidden_containers_are_not_open_menus() {
 }
 
 #[test]
+fn hidden_menu_items_are_not_evidence_of_an_open_menu() {
+    let mut tree = popup_in_dialog().hidden(4).hidden(5).hidden(6);
+    assert_eq!(search(&mut tree).1, None);
+}
+
+#[test]
+fn a_hidden_item_does_not_mask_a_later_visible_popup() {
+    let mut tree = popup_in_dialog()
+        .node(0, "AXWindow", &[1, 2, 7])
+        .node(7, "AXGroup", &[8])
+        .node(8, "AXMenuItem", &[])
+        .hidden(4)
+        .hidden(5)
+        .hidden(6);
+    assert_eq!(search(&mut tree).1, Some(("app/children/2".into(), 7)));
+}
+
+#[test]
 fn menu_roles_never_become_popup_containers() {
     let mut hidden_menu = popup_in_dialog().node(3, "AXMenu", &[4, 5, 6]).hidden(3);
     assert_eq!(search(&mut hidden_menu).1, None);

@@ -51,6 +51,9 @@ fn record_container<T: Clone>(
     let Some(slot) = container.filter(|slot| slot.is_none()) else {
         return Ok(());
     };
+    if reader.boolean(&item.element, "AXVisible")? == Some(false) {
+        return Ok(());
+    }
     if let Some(parent) = item.parent.as_ref()
         && is_popup_container(parent, reader)?
     {
